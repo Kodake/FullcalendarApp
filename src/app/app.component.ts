@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CalendarOptions } from '@fullcalendar/angular';
-import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
+import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
-
+import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
 
 @Component({
   selector: 'app-root',
@@ -10,56 +9,78 @@ import listPlugin from '@fullcalendar/list';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'FrontEnd';
-  calendarOptions: CalendarOptions | undefined
 
+  calendarOptions: CalendarOptions | undefined;
+  currentEvents: EventApi[] = [];
+  calendarVisible = true;
+  eventId = 0;
   listEvents: Array<any> = [
-    { title: 'event 1', date: '2021-10-15' },
-    { title: 'event 2', date: '2021-10-16' }
+    {
+      id: this.createId(),
+      title: 'All-day event',
+      start: new Date().toISOString().replace(/T.*$/, '')
+    },
+    {
+      id: this.createId(),
+      title: 'Timed event',
+      start: new Date().toISOString().replace(/T.*$/, '') + 'T12:00:00'
+    }
   ]
 
   ngOnInit(): void {
     this.calendarOptions = {
-      timeZone: 'UTC',
-      initialView: 'dayGridMonth',
       plugins: [interactionPlugin, listPlugin],
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridDay,dayGridWeek,dayGridMonth,listWeek'
+        right: 'dayGridMonth,dayGridWeek,dayGridDay,listWeek'
       },
-      dateClick: this.handleDateClick.bind(this), // bind is important!
+      initialView: 'dayGridMonth',
+      initialEvents: this.listEvents, // alternatively, use the `events` setting to fetch from a feed
+      weekends: true,
       editable: true,
       selectable: true,
-      events: this.listEvents
-      // events: 'https://fullcalendar.io/demo-events.json'
+      selectMirror: true,
+      dayMaxEvents: true,
+      select: this.handleDateSelect.bind(this),
+      eventClick: this.handleEventClick.bind(this),
+      eventsSet: this.handleEvents.bind(this)
+      /* you can update a remote database when these fire:
+      eventAdd:
+      eventChange:
+      eventRemove:
+      */
     };
   }
 
-  updateEvents() {
-    const event = {
-      title: 'title x',
-      date: '2021-10-02'
+  handleDateSelect(selectInfo: DateSelectArg) {
+    const title = prompt('Please enter a new title for your event.');
+    const calendarApi = selectInfo.view.calendar;
+
+    calendarApi.unselect(); // clear date selection
+
+    if (title) {
+      calendarApi.addEvent({
+        id: this.createId(),
+        title,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
+        allDay: selectInfo.allDay
+      });
     }
-    this.listEvents.push({ event });
   }
 
-  handleDateClick(arg: { dateStr: string; }) {
-
-    var dateStr = prompt('Enter a date in YYYY-MM-DD format');
-    var date = new Date(dateStr + 'T00:00:00'); // will be in local time
-
-    if (!isNaN(date.valueOf())) { // valid?
-      const event = {
-        title: 'event ' + this.listEvents.length,
-        date: arg.dateStr
-      }
-      this.listEvents.push(event);
-      console.log(this.listEvents);
-      alert('Great. Now, update your database...');
-    } else {
-      alert('Invalid date.');
+  handleEventClick(clickInfo: EventClickArg) {
+    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'?`)) {
+      clickInfo.event.remove();
     }
-    this.ngOnInit();
+  }
+
+  handleEvents(events: EventApi[]) {
+    this.currentEvents = events;
+  }
+
+  createId() {
+    return String(this.eventId++);
   }
 }
