@@ -34,8 +34,21 @@ export class AppComponent implements OnInit {
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,dayGridWeek,dayGridDay,listWeek,resourceTimelineYear'
+        right: 'resourceTimelineDay,resourceTimelineTenDay,resourceTimelineMonth,resourceTimelineYear,listWeek'
       },
+      views: {
+        resourceTimelineDay: {
+          buttonText: ':15 slots',
+          slotDuration: '00:15'
+        },
+        resourceTimelineTenDay: {
+          type: 'resourceTimeline',
+          duration: { days: 10 },
+          buttonText: '10 days'
+        }
+      },
+      schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+      aspectRatio: 1.5,
       resourceAreaHeaderContent: 'Rooms',
       resources: 'https://fullcalendar.io/demo-resources.json?with-nesting&with-colors',
       events: 'https://fullcalendar.io/demo-events.json?single-day&for-resource-timeline',
