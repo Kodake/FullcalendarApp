@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
+import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 
 @Component({
   selector: 'app-root',
@@ -29,13 +30,16 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.calendarOptions = {
-      plugins: [interactionPlugin, listPlugin],
+      plugins: [interactionPlugin, listPlugin, resourceTimelinePlugin],
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,dayGridWeek,dayGridDay,listWeek'
+        right: 'dayGridMonth,dayGridWeek,dayGridDay,listWeek,resourceTimelineYear'
       },
-      initialView: 'dayGridMonth',
+      resourceAreaHeaderContent: 'Rooms',
+      resources: 'https://fullcalendar.io/demo-resources.json?with-nesting&with-colors',
+      events: 'https://fullcalendar.io/demo-events.json?single-day&for-resource-timeline',
+      initialView: 'resourceTimelineYear',
       initialEvents: this.listEvents, // alternatively, use the `events` setting to fetch from a feed
       weekends: true,
       editable: true,
