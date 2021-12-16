@@ -3,6 +3,8 @@ import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
+import esLocale from "@fullcalendar/core/locales/es";
+import frLocale from "@fullcalendar/core/locales/fr";
 
 @Component({
   selector: 'app-root',
@@ -30,21 +32,30 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.calendarOptions = {
+      locales: [esLocale, frLocale],
+      locale: 'es', // the initial locale. of not specified, uses the first one
       plugins: [interactionPlugin, listPlugin, resourceTimelinePlugin],
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'resourceTimelineDay,resourceTimelineTenDay,resourceTimelineMonth,resourceTimelineYear,listWeek'
+        right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth,resourceTimelineYear,listMonth'
       },
       views: {
-        resourceTimelineDay: {
-          buttonText: ':15 slots',
-          slotDuration: '00:15'
+        resourceTimelineWeek: {
+          type: 'resourceTimelineDay',
+          duration: { weeks: 1 },
+          slotDuration: { days: 1 },
         },
-        resourceTimelineTenDay: {
-          type: 'resourceTimeline',
-          duration: { days: 10 },
-          buttonText: '10 days'
+        resourceTimelineMonth: {
+          type: 'resourceTimelineWeek',
+          duration: { months: 1 },
+          slotDuration: { weeks: 1 },
+        },
+        resourceTimelineYear: {
+          type: 'resourceTimelineMonth',
+          duration: { years: 1 },
+          slotDuration: { months: 1 },
+          buttonText: 'Year',
         }
       },
       schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
